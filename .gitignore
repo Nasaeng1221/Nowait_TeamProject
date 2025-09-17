@@ -1,0 +1,26 @@
+# Build & IDE
+target/
+*.war
+*.log
+*.iml
+.idea/
+.project
+.classpath
+.settings/
+bin/
+out/
+
+# OS
+.DS_Store
+
+# Node/Front (혹시 있을 경우)
+node_modules/
+
+# App secrets (예: 로컬 전용 설정)
+src/main/resources/application-local.properties
+src/main/resources/application-secret.properties
+
+# Tomcat 배포물/작업폴더
+/opt/tomcat/
+/work/
+/webapps/

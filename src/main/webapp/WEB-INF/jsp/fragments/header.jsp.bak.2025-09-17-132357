@@ -1,0 +1,42 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
+<!-- header.jsp -->
+
+<!-- CSS도 같이 포함 -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/header/header.css">
+    
+
+<header>
+        <!-- 왼쪽 로고 -->
+        <div class="logo">
+            <a href="${pageContext.request.contextPath}/intro">
+                <img src="${pageContext.request.contextPath}/img/intro/logo.jpg" alt="nowait 로고">
+            </a>
+        </div>
+
+        <!-- 오른쪽 로그인/회원가입 -->
+        <nav class="nav-menu">
+            <a href="#" class="login">로그인</a>
+            <a href="#" class="signup">회원가입</a>
+        </nav>
+    </header>
+
+    <!-- 노란색 구분선 -->
+    <hr class="yellow-line" />
+<!-- NAV-AUTO-WIRE -->
+<script>
+(function(){
+  var ctx = '<%= request.getContextPath()%>';
+  function wire(cls, path){
+    document.querySelectorAll('a.'+cls).forEach(function(a){
+      a.setAttribute('href', ctx + path);
+      a.addEventListener('click', function(ev){
+        // 다른 스크립트가 preventDefault 해도 이동 보장
+        if (!a.getAttribute('href') || a.getAttribute('href') === '#') ev.preventDefault();
+        window.location.href = ctx + path;
+      }, {capture:true});
+    });
+  }
+  wire('login',  '/login.jsp');
+  wire('signup', '/signup.jsp');
+})();
+</script>

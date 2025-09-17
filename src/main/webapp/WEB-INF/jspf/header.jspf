@@ -1,0 +1,20 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+  String memberName = (String) session.getAttribute("memberName");
+  String userName = (String) session.getAttribute("userName");
+  String displayName = memberName != null ? memberName : (userName != null ? userName : null);
+%>
+<nav class="navbar" style="display:flex; align-items:center; justify-content:space-between;">
+  <div class="nav-left">
+    <a href="<%= request.getContextPath()%>/">로고</a>
+  </div>
+  <div class="nav-right">
+    <% if (displayName != null) { %>
+      <span><%= displayName %> 님</span> | <a href="<%= request.getContextPath()%>/logout">로그아웃</a>
+    <% } else { %>
+      <a href="<%= request.getContextPath()%>/login.jsp">로그인</a> | <a href="<%= request.getContextPath()%>/signup.jsp">회원가입</a>
+    <% } %>
+  </div>
+</nav>
+<link rel="stylesheet" href="<%= request.getContextPath()%>/assets/app.css">
+<link rel="stylesheet" href="<%= request.getContextPath()%>/assets/overrides.css">

@@ -1,0 +1,171 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
+    <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+        <%@ include file="/WEB-INF/jsp/fragments/header.jsp" %>
+
+            <html>
+
+            <head>
+                <link rel="stylesheet" href="${pageContext.request.contextPath}/css/detail/detail.css" />
+            </head>
+
+            <body>
+                <div class="detail-wrap">
+                    <!-- 왼쪽: 이미지 + 가게 정보 -->
+                    <div class="detail-left">
+                        <img class="detail-img" src="${pageContext.request.contextPath}/img/intro/${restaurant.image}"
+                            alt="${restaurant.name}" />
+
+                        <div class="detail-info">
+                            <h2 class="shop-title">${restaurant.name}</h2>
+                            <p><strong>주소:</strong> ${restaurant.address}</p>
+                            <p><strong>연락처:</strong> ${restaurant.phone}</p>
+                            <p><strong>운영시간:</strong> ${restaurant.openHours}</p>
+                            <p><strong>주메뉴:</strong> ${restaurant.mainMenu}</p>
+                        </div>
+                    </div>
+
+                    <!-- 오른쪽: 예약 박스 -->
+                    <div class="detail-right">
+                        <div class="reservation-box">
+                            <div class="resv-head">
+                                <h3>날짜와 시간을 선택해 주세요</h3>
+                                <div class="month-nav">
+                                    <button id="prevMonth" class="nav-btn" aria-label="이전 달">◀</button>
+                                    <span id="monthTitle" class="month-title"></span>
+                                    <button id="nextMonth" class="nav-btn" aria-label="다음 달">▶</button>
+                                </div>
+                            </div>
+
+                            <!-- 달력 -->
+                            <div id="calendar" class="calendar"></div>
+
+                            <!-- 시간 슬롯 -->
+                            <div id="timeSlots" class="time-slots"></div>
+
+                            <!-- ✅ 예약 입력 -->
+                            <form id="reserveForm"
+                                action="${pageContext.request.contextPath}/api/reservations"
+                                method="post" class="reserve-form-inline">
+
+                                <!-- Hidden 값 -->
+                                <input type="hidden" name="restaurantId" value="${restaurant.id}" />
+                                <c:if test="${not empty sessionScope.member}">
+                                    <input type="hidden" name="memberId" value="${sessionScope.member.id}" />
+                                </c:if>
+
+                                <!-- 예약자 입력 (가로 배치) -->
+                                <input id="nameInput" type="text" name="customerName" placeholder="성함" required />
+                                <input id="phoneInput" type="text" name="customerPhone" placeholder="연락처" required />
+        <input id="partyInput" type="number" name="partySize" placeholder="인원수" min="1" value="2" required style="width:90px" />
+                                <button type="submit" class="reserve-btn">예약하기</button>
+
+                                <!-- 날짜/시간 hidden -->
+                                <input type="hidden" name="date" id="selectedDate" />
+                                <input type="hidden" name="time" id="selectedTime" />
+
+                                <input type="hidden" name="reservedDate" id="reservedDate" />
+                                <input type="hidden" name="reservedTime" id="reservedTime" />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-section">
+                    <h3>리뷰</h3>
+                    <form class="review-form"
+                        action="${pageContext.request.contextPath}/restaurants/${restaurant.id}/reviews" method="post">
+                        <textarea name="content" placeholder="리뷰를 작성해주세요" required></textarea>
+                        <div class="review-actions">
+                            <select name="rating">
+                                <option value="5">⭐️⭐️⭐️⭐️⭐️</option>
+                                <option value="4">⭐️⭐️⭐️⭐️</option>
+                                <option value="3">⭐️⭐️⭐️</option>
+                                <option value="2">⭐️⭐️</option>
+                                <option value="1">⭐️</option>
+                            </select>
+                            <button type="submit">등록</button>
+                        </div>
+                    </form>
+
+                    <div class="review-list">
+                        <c:forEach var="review" items="${reviews}">
+                            <div class="review-item">
+                                <div class="review-meta">
+                                    <strong>${review.memberName}</strong>
+                                    <span class="rating">(${review.rating}점)</span>
+                                    <span class="date">${review.createdAt}</span>
+                                </div>
+                                <p class="review-content">${review.content}</p>
+                            </div>
+                        </c:forEach>
+                        <c:if test="${empty reviews}">
+                            <div class="no-review">등록된 리뷰가 없습니다.</div>
+                        </c:if>
+                    </div>
+                </div>
+
+                <script>
+                    window.REST_ID = "${restaurant.id}";
+                    window.OPEN_HOURS = "${restaurant.openHours}";
+
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.member}">window.IS_LOGGED_IN = true;</c:when>
+                        <c:otherwise>window.IS_LOGGED_IN = false;</c:otherwise>
+                    </c:choose>
+
+
+    // RESERVE_SUBMIT_HOOK
+
+    (function(){
+
+      var f=document.getElementById("reserveForm"); if(!f) return;
+
+      f.addEventListener("submit", function(ev){
+
+        // 로그인 안 되어 있으면 로그인 페이지로 유도
+
+        if(!window.IS_LOGGED_IN){ ev.preventDefault(); location.href="${pageContext.request.contextPath}/login.jsp?next="+encodeURIComponent(location.pathname+location.search); return; }
+
+        // 기존 selectedDate/selectedTime 값을 reservedDate/Time 에 복사
+
+        var d=document.getElementById("selectedDate"); var t=document.getElementById("selectedTime");
+
+        var rd=document.getElementById("reservedDate"); var rt=document.getElementById("reservedTime");
+
+        if(d&&rd) rd.value = d.value; if(t&&rt) rt.value = t.value;
+
+      });
+
+    })();
+
+                </script>
+
+                <%@ include file="/WEB-INF/jsp/fragments/footer.jsp" %>
+    // RESERVE_SUBMIT_HOOK
+
+    (function(){
+
+      var f=document.getElementById("reserveForm"); if(!f) return;
+
+      f.addEventListener("submit", function(ev){
+
+        // 로그인 안 되어 있으면 로그인 페이지로 유도
+
+        if(!window.IS_LOGGED_IN){ ev.preventDefault(); location.href="${pageContext.request.contextPath}/login.jsp?next="+encodeURIComponent(location.pathname+location.search); return; }
+
+        // 기존 selectedDate/selectedTime 값을 reservedDate/Time 에 복사
+
+        var d=document.getElementById("selectedDate"); var t=document.getElementById("selectedTime");
+
+        var rd=document.getElementById("reservedDate"); var rt=document.getElementById("reservedTime");
+
+        if(d&&rd) rd.value = d.value; if(t&&rt) rt.value = t.value;
+
+      });
+
+    })();
+
+                    <script src="${pageContext.request.contextPath}/js/detail/detail.js"></script>
+            </body>
+
+            </html>

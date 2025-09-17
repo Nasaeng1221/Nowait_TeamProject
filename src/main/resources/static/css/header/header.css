@@ -1,0 +1,64 @@
+
+
+.logo a {
+  display: inline-block;
+}
+
+.logo img {
+  height: 40px;  /* 기존 크기 */
+  width: auto;
+  cursor: pointer; /* 마우스 올리면 손가락 모양 */
+}
+
+/* 헤더 */
+header {
+    display: flex;
+    justify-content: space-between;
+    /* 좌우 배치 */
+    align-items: center;
+    padding: 20px 40px;
+    /* 👉 위아래 20px, 좌우 40px */
+    background-color: #fff;
+    border-bottom: 2px solid #f7c600;
+    /* 노란색 구분선 */
+}
+
+/* 로고 */
+header .logo img {
+    height: 60px;
+    /* 로고 크기도 조절 가능 */
+    width: auto;
+}
+
+/* 공통 */
+header .nav-menu a {
+    margin-left: 20px;
+    font-size: 14px;
+    text-decoration: none;
+    color: #000;
+}
+
+/* 로그인 버튼 */
+header .nav-menu .login,
+header .nav-menu .signup {
+    border: 1px solid #000;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-left: 8px;
+}
+
+header .nav-menu .login:hover,
+header .nav-menu .signup:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+/* 구분선 */
+.yellow-line {
+    border: none;
+    border-top: 2px solid #FFD700;
+    /* 노란색 얇은 선 */
+    margin: 0;
+}

@@ -1,0 +1,105 @@
+package com.myboot.intro.controller;
+
+import jakarta.servlet.http.HttpSession;
+
+import com.myboot.detail.model.Reservation;
+import com.myboot.detail.model.Review;
+import com.myboot.detail.repository.ReviewRepository;
+import com.myboot.detail.repository.ReservationRepository;
+import com.myboot.detail.service.ReservationService;
+import com.myboot.intro.model.Restaurant;
+import com.myboot.intro.repository.RestaurantRepository;
+import com.myboot.domain.Member;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@Controller
+@RequestMapping("/restaurants")
+@RequiredArgsConstructor
+public class RestaurantController {
+
+    private final RestaurantRepository restaurantRepository;
+    private final ReservationService reservationService;
+    private final ReviewRepository reviewRepository;
+    private final ReservationRepository reservationRepository;
+
+    /** 상세 페이지 */
+    @GetMapping("/{id:\\d+}")
+    public String getRestaurant(@PathVariable Long id, Model model, HttpSession session) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("식당을 찾을 수 없습니다."));
+        model.addAttribute("restaurant", restaurant);
+
+        // 리뷰 목록
+        List<Review> reviews = reviewRepository.findByRestaurantIdOrderByCreatedAtDesc(id);
+        model.addAttribute("reviews", reviews);
+
+        return "detail/detail";
+    }
+
+    /** 예약 가능 시간 조회 */
+    @GetMapping("/{id}/availability")
+    @ResponseBody
+    public Map<String, Object> getAvailability(@PathVariable Long id, @RequestParam("date") String date) {
+        Restaurant r = restaurantRepository.findById(id).orElseThrow(() -> new RuntimeException("가게 없음"));
+        return Map.of("availableTimes", reservationService.getAvailableTimes(id, date, r.getOpenHours()), "fullyBooked",
+                reservationService.isFullyBooked(id, date, r.getOpenHours()));
+    }
+
+    /** 예약 저장 */
+    @PostMapping("/{id}/reservations")
+    @ResponseBody
+    public Map<String, Object> makeReservation(@PathVariable Long id, @RequestBody Map<String, String> payload,
+            HttpSession session) {
+
+        // ✅ 로그인 확인
+        Long memberId = (Long) session.getAttribute("memberId");
+        if (memberId == null) {
+            return Map.of("result", "FAIL", "message", "로그인 후 예약 가능합니다.");
+        }
+
+        String date = payload.get("date");
+        String time = payload.get("time");
+        String customerName = payload.get("customerName");
+        String customerPhone = payload.get("customerPhone");
+
+        Reservation reservation = reservationService.makeReservation(id, memberId, customerName, customerPhone, date,
+                time);
+
+        return Map.of("result", "OK", "reservationId", reservation.getId());
+    }
+
+    /** 리뷰 저장 */
+    @PostMapping("/{id}/reviews")
+    @ResponseBody
+    public String writeReview(@PathVariable Long id, @RequestParam("content") String content,
+            @RequestParam(value = "rating", defaultValue = "5") Integer rating, HttpSession session) {
+
+        // ✅ 로그인 확인
+        Member member = (Member) session.getAttribute("member");
+        if (member == null) {
+            return "<script>alert('로그인 후 리뷰 작성 가능합니다.'); history.back();</script>";
+        }
+
+        // ✅ 예약 여부 확인
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("레스토랑을 찾을 수 없습니다."));
+
+        boolean hasReservation = reservationRepository.existsByRestaurantAndMember_Id(restaurant, member.getId());
+        if (!hasReservation) {
+            return "<script>alert('예약 내역이 있어야 리뷰 작성이 가능합니다.'); history.back();</script>";
+        }
+
+        // ✅ 리뷰 저장
+        Review review = Review.builder().restaurant(restaurant).memberName(member.getName()).content(content)
+                .rating(rating).build();
+        reviewRepository.save(review);
+
+        return "<script>alert('리뷰가 등록되었습니다.'); location.href='/restaurants/" + id + "';</script>";
+    }
+}

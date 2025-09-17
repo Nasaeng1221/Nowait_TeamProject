@@ -1,0 +1,342 @@
+body {
+  background: #fff;
+  margin: 0;
+  font-family: 'NanumSquare', sans-serif;
+}
+
+/* 메인 히어로 */
+.main-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  margin: 40px 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 왼쪽 타이틀 */
+.title-box {
+  text-align: left;
+  margin-bottom: 20px;
+  padding-left: 20px;
+}
+.title-text {
+  font-size: 42px;
+  font-weight: 600;
+  color: #000;
+  margin: 5px 0;
+}
+
+/* 검색창 */
+.search-box {
+  display: flex;
+  align-items: center;
+  border: 2px solid #ccc;
+  border-radius: 13px;
+  width: 550px;
+  height: 80px;
+  padding: 0 15px;
+  margin-top: 25px;
+  box-sizing: border-box;
+}
+.search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 18px;
+}
+.search-box button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: #555;
+  display: flex;
+  align-items: center;
+}
+.search-box button:hover {
+  color: #000;
+}
+
+/* 좌우 배치 */
+.hero-left {
+  flex: 0 0 auto;
+  margin-left: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 40px;
+}
+.hero-right {
+  flex: 0 0 auto;
+  margin-right: 140px;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* 슬라이더 */
+.hero-slider {
+  position: relative;
+  width: 520px;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 18px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .15);
+  background: #fff;
+}
+
+/* 슬라이드 */
+.slide {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: transform .7s cubic-bezier(.22, .61, .36, 1), opacity .7s ease;
+  z-index: 1;
+}
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  z-index: 3;
+}
+.slide.exit-left {
+  transform: translateX(-100%);
+  opacity: 0;
+  z-index: 2;
+}
+.slide.exit-right {
+  transform: translateX(100%);
+  opacity: 0;
+  z-index: 2;
+}
+
+/* 슬라이드 내용 */
+.slide-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12px 32px;
+  text-align: left;
+}
+.slide-icon {
+  margin-bottom: 18px;
+  margin-left: -10px;
+}
+.slide-icon svg {
+  width: 140px;
+  height: 80px;
+}
+.slide-content h2 {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0 0 8px;
+  color: #111;
+}
+.slide-content p {
+  font-size: 14px;
+  margin: 0;
+  color: #333;
+}
+
+/* 인디케이터 */
+.indicators {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, .6);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.dot.active {
+  background: #fff;
+}
+
+/* 카테고리 */
+.food-menu {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 70px;
+  margin: 70px 0 150px;
+}
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+.menu-item .icon {
+  font-size: 45px;
+  margin-bottom: 8px;
+}
+.menu-item .label {
+  font-size: 15px;
+  color: #222;
+  font-weight: 500;
+}
+
+/* 오늘의 선정맛집 */
+/* 오늘의 선정맛집 */
+.today-restaurant {
+  display: flex;
+  align-items: flex-start;      /* 위쪽 기준 정렬 */
+  justify-content: flex-start;  /* 왼쪽 기준 배치 */
+  margin: 80px auto;
+  max-width: 1400px;
+  gap: 60px;                    /* 글씨와 카드 간격 */
+  padding-left: 170px;          /* 🔽 전체 위치를 왼쪽으로 조금 이동 */
+}
+
+.today-left {
+  flex-shrink: 0;
+  padding-top: 40px;            /* 글씨를 조금 내려 카드 시작선 맞춤 */
+}
+
+
+.today-left h2 {
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1.4;
+  margin: 0;
+  color: #111;
+}
+
+.today-left .highlight {
+  color: #f7c600;
+}
+
+.today-right {
+  display: flex;
+  flex-direction: row;          /* 카드 가로 배치 */
+  gap: 35px;                    /* 카드 간격 살짝 좁힘 */
+  align-items: flex-start;      /* 카드와 글씨 위 기준 맞춤 */
+}
+
+/* 기본 카드 (오늘의 선정맛집 3개) */
+.today-right .card {
+  width: 280px;
+  text-align: center;
+  cursor: pointer;
+}
+.today-right .card-img {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.today-right .card-img img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+.today-right .card-img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.3);
+  opacity: 0;
+  border-radius: 12px;
+  transition: opacity 0.3s ease;
+}
+.today-right .card-img:hover img {
+  transform: scale(1.05);
+}
+.today-right .card-img:hover::after {
+  opacity: 1;
+}
+.today-right .card p {
+  margin-top: 12px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 검색 결과 카드 */
+#restaurant-results {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 50px;
+  margin: 50px auto;
+  max-width: 1400px;
+}
+#restaurant-results .card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  text-align: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+#restaurant-results .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+}
+#restaurant-results .card-img {
+  position: relative;
+  overflow: hidden;
+  height: 280px;
+}
+#restaurant-results .card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+#restaurant-results .card-img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+#restaurant-results .card-img:hover img {
+  transform: scale(1.05);
+}
+#restaurant-results .card-img:hover::after {
+  opacity: 1;
+}
+#restaurant-results .card p {
+  margin-top: 12px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 페이지네이션 */
+#pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 8px;
+}
+#pagination .page-btn {
+  padding: 8px 14px;
+  border: 2px solid #f7c600;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+#pagination .page-btn.active {
+  background: #f7c600;
+  color: #fff;
+  font-weight: 700;
+}

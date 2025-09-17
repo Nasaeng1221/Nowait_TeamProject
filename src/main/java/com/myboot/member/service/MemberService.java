@@ -1,0 +1,26 @@
+package com.myboot.member.service;
+
+import com.myboot.domain.Member;
+import com.myboot.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class MemberService {
+    private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
+
+    /** 회원가입 */
+    public Member register(Member member) {
+        member.setPassword(passwordEncoder.encode(member.getPassword())); // 비밀번호 암호화
+        return memberRepository.save(member);
+    }
+
+    /** 로그인 */
+    public Member login(String username, String password) {
+        return memberRepository.findByUsername(username).filter(m -> passwordEncoder.matches(password, m.getPassword()))
+                .orElse(null);
+    }
+}

@@ -1,0 +1,84 @@
+package com.myboot.detail.service;
+
+import com.myboot.detail.model.Reservation;
+import com.myboot.detail.repository.ReservationRepository;
+import com.myboot.intro.model.Restaurant;
+import com.myboot.intro.repository.RestaurantRepository;
+import com.myboot.domain.Member;
+import com.myboot.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+@Service
+@RequiredArgsConstructor
+public class ReservationService {
+
+    private final RestaurantRepository restaurantRepository;
+    private final MemberRepository memberRepository;
+    private final ReservationRepository reservationRepository;
+
+    /** 예약 저장 */
+    public Reservation makeReservation(Long restaurantId, Long memberId, String customerName, String customerPhone,
+            String date, String time) {
+        LocalDate targetDate = LocalDate.parse(date);
+
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new RuntimeException("가게 없음"));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new RuntimeException("회원 없음"));
+
+        boolean exists = reservationRepository.existsByRestaurantAndReservedDateAndReservedTime(restaurant, targetDate,
+                time);
+        if (exists)
+            throw new RuntimeException("이미 예약된 시간입니다.");
+
+        Reservation r = Reservation.builder().restaurant(restaurant).member(member).customerName(customerName)
+                .customerPhone(customerPhone).reservedDate(targetDate).reservedTime(time).status("CONFIRMED").build();
+
+        return reservationRepository.save(r);
+    }
+
+    /** 특정 가게 + 날짜 → 예약된 시간(HH:mm) */
+    public List<String> getReservedTimes(Long restaurantId, String date) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new RuntimeException("가게 없음"));
+        LocalDate target = LocalDate.parse(date);
+        return reservationRepository.findByRestaurantAndReservedDate(restaurant, target).stream()
+                .map(Reservation::getReservedTime).toList();
+    }
+
+    /** 특정 가게 + 날짜 → 남은 시간(HH:mm) 리스트 */
+    public List<String> getAvailableTimes(Long restaurantId, String date, String openHours) {
+        List<String> reserved = getReservedTimes(restaurantId, date);
+
+        String[] hours = openHours.split("~");
+        LocalTime start = LocalTime.parse(hours[0], DateTimeFormatter.ofPattern("HH:mm"));
+        LocalTime end = LocalTime.parse(hours[1], DateTimeFormatter.ofPattern("HH:mm"));
+
+        List<String> slots = new ArrayList<>();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm");
+        for (LocalTime t = start; !t.isAfter(end.minusMinutes(30)); t = t.plusMinutes(30)) {
+            String hhmm = t.format(fmt);
+            if (!reserved.contains(hhmm))
+                slots.add(hhmm);
+        }
+        return slots;
+    }
+
+    /** 해당 날짜가 전부 예약(=모든 슬롯 사용)인지 */
+    public boolean isFullyBooked(Long restaurantId, String date, String openHours) {
+        String[] hours = openHours.split("~");
+        LocalTime start = LocalTime.parse(hours[0]);
+        LocalTime end = LocalTime.parse(hours[1]);
+
+        int totalSlots = 0;
+        for (LocalTime t = start; !t.isAfter(end.minusMinutes(30)); t = t.plusMinutes(30))
+            totalSlots++;
+
+        return getReservedTimes(restaurantId, date).size() >= totalSlots;
+    }
+}
