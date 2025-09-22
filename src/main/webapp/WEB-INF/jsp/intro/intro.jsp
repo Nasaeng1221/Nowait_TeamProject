@@ -148,31 +148,50 @@
                     </div>
                 </div>
 
-                <!-- 오늘의 선정맛집 / 검색 결과 영역 -->
-                <section id="today-section" class="today-restaurant">
-                    <div class="today-left" id="today-title">
-                        <h2>오늘의<br><span class="highlight">선정맛집!</span></h2>
-                    </div>
+<!-- 오늘의 선정맛집 / 검색 결과 영역 -->
+<section id="today-section" class="today-restaurant">
+    <div class="today-left" id="today-title">
+        <h2>오늘의<br><span class="highlight">선정맛집!</span></h2>
+    </div>
 
-                    <div class="today-right">
-                        <!-- ✅ DB에서 가져온 랜덤 맛집 3개 출력 -->
-                        <div id="restaurant-results" class="restaurant-list">
-                            <c:forEach var="r" items="${randomRestaurants}">
-                                <div class="card"
-                                    onclick="location.href='${pageContext.request.contextPath}/restaurants/${r.id}'">
-                                    <div class="card-img">
-                                        <img src="${pageContext.request.contextPath}/img/intro/${r.image}"
-                                            alt="${r.name}" />
-                                    </div>
-                                    <p>${r.dong} ${r.name}</p>
-                                </div>
-                            </c:forEach>
-                        </div>
-
-                        <!-- ✅ 페이지네이션 (검색 결과 시에만 활성화) -->
-                        <div id="pagination" class="pagination"></div>
+    <div class="today-right">
+        <!-- ✅ DB에서 가져온 랜덤 맛집 3개 출력 -->
+        <div id="restaurant-results" class="restaurant-list">
+            <c:forEach var="r" items="${randomRestaurants}">
+                <div class="card"
+                     onclick="location.href='${pageContext.request.contextPath}/restaurants/${r.id}'">
+                    <div class="card-img">
+                        <c:choose>
+                            <c:when test="${not empty r.image}">
+                                <!-- 업로드된 이미지 사용, 깨지면 기본이미지로 대체 -->
+                                <img
+                                    src="${pageContext.request.contextPath}/uploads/${r.image}"
+                                    alt="${r.name}"
+                                    loading="lazy"
+                                    style="width:100%;height:100%;object-fit:cover;"
+                                    onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/img/no-image.png';"
+                                />
+                            </c:when>
+                            <c:otherwise>
+                                <!-- 이미지가 없으면 기본이미지 -->
+                                <img
+                                    src="${pageContext.request.contextPath}/img/no-image.png"
+                                    alt="이미지 없음"
+                                    loading="lazy"
+                                    style="width:100%;height:100%;object-fit:cover;"
+                                />
+                            </c:otherwise>
+                        </c:choose>
                     </div>
-                </section>
+                    <p>${r.dong} ${r.name}</p>
+                </div>
+            </c:forEach>
+        </div>
+
+        <!-- ✅ 페이지네이션 (검색 결과 시에만 활성화) -->
+        <div id="pagination" class="pagination"></div>
+    </div>
+</section>
 
                 <%@ include file="/WEB-INF/jsp/fragments/footer.jsp" %>
                     <script src="${pageContext.request.contextPath}/js/intro/intro.js"></script>
