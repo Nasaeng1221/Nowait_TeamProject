@@ -1,0 +1,22 @@
+package com.myboot.security;
+
+import org.springframework.context.annotation.*;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@Order(0)
+public class UploadsSecurityConfig {
+    @Bean
+    SecurityFilterChain uploadsChain(HttpSecurity http) throws Exception {
+        http
+           .securityMatcher("/uploads/**")
+           .authorizeHttpRequests(a -> a.anyRequest().permitAll())
+           .csrf(csrf -> csrf.disable())
+           .requestCache(c -> c.disable())
+           .securityContext(c -> c.disable())
+           .sessionManagement(s -> s.disable());
+        return http.build();
+    }
+}

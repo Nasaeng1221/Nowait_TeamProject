@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 
-@WebServlet(urlPatterns={"/api/owner/restaurants","/api/owner/restaurants/*"})
+// @WebServlet(urlPatterns={"/api/owner/restaurants","/api/owner/restaurants/*"})
 public class OwnerRestaurantServlet extends HttpServlet {
   private final OwnerRestaurantDAO dao=new OwnerRestaurantDAO();
   private final Gson gson=new Gson();
